@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.turbo/
+*.tsbuildinfo
+coverage/
+.husky/_/
+build
+coverage
+.env
+.env.*
+.DS_Store
