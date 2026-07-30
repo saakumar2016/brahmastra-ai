@@ -81,6 +81,16 @@ After loading the extension, perform these checks:
 brahmastra-ai/
 ├── apps/
 │   └── extension/       # Chrome Extension (Manifest V3)
+│       └── src/
+│           ├── components/   # Reusable UI components
+│           ├── styles/       # Global base styles
+│           ├── theme/        # Centralized CSS theme tokens
+│           ├── popup/        # Popup React app
+│           ├── sidepanel/    # Side Panel React app
+│           ├── background/   # Service Worker
+│           ├── content/      # Content Script
+│           ├── shared/       # Shared messaging layer
+│           └── types/        # Shared TypeScript types
 ├── packages/            # Shared libraries
 ├── docs/                # Project documentation
 └── (config files)       # Root workspace configuration
