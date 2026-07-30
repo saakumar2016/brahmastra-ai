@@ -38,9 +38,31 @@ The built extension is output to `apps/extension/dist/`.
 
 ### Verifying the install
 
-- **Popup**: Click the extension icon in the toolbar to see "Brahmastra AI Chrome Extension Loaded"
-- **Side Panel**: Open the side panel via the extension icon or `chrome://extensions` shortcuts
-- **Console**: Open DevTools on any page — you should see "Brahmastra content script loaded" on TradingView/Kite pages
+After loading the extension, perform these checks:
+
+**Popup**
+
+1. Click the extension icon in the toolbar
+2. Click **Check Extension Status**
+3. You should see: Loaded: Yes, Version, and Timestamp
+
+**Side Panel**
+
+1. Open the side panel (right-click extension icon → "Inspect popup" or use Chrome's side panel toggle)
+2. Click **Ping Background**
+3. You should see "PONG" appear below the button
+
+**Content Script**
+
+1. Navigate to `https://www.tradingview.com` or `https://kite.zerodha.com`
+2. Open DevTools console (F12)
+3. You should see: "Communication established"
+
+**Background Worker**
+
+1. Go to `chrome://extensions`
+2. Find Brahmastra AI → click "Service Worker" link
+3. Console should show: "Background worker started"
 
 ## Scripts
 
