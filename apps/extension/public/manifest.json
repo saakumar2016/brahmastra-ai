@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Brahmastra AI",
+  "version": "0.1.0",
+  "description": "AI-powered trading assistant",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "Brahmastra AI"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.tradingview.com/*", "https://kite.zerodha.com/*"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
