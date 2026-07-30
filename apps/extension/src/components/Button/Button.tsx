@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
 import styles from "./Button.module.css";
 
 interface ButtonProps {
-  children: string;
+  children: ReactNode;
   onClick: () => void;
   variant?: "primary" | "secondary";
   fullWidth?: boolean;

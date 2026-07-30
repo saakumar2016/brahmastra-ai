@@ -197,7 +197,7 @@ The extension UI is built with React, CSS Modules, and a centralized CSS custom 
 
 ### Design Principles
 
-1. **Centralized Theme** — All colors, spacing, typography, shadows, and radii are defined as CSS custom properties in `src/theme/theme.css`. No hardcoded values anywhere in the application.
+1. **Centralized Theme** — All colors, spacing, typography, shadows, and radii are defined as CSS custom properties in `src/theme/` (split into modular files). No hardcoded values anywhere in the application.
 2. **Reusable Components** — Shared UI components live in `src/components/`. Both Popup and Side Panel consume these components for a consistent look.
 3. **CSS Modules** — Each component has a co-located `.module.css` file for scoped styling. No inline styles.
 4. **Shared Layout** — The `Layout` component provides consistent spacing, padding, and structure for both Popup and Side Panel.
@@ -216,8 +216,14 @@ apps/extension/src/
 │   ├── base.css          # Reset + base element styles
 │   └── index.css         # Imports theme + base
 ├── theme/                # Centralized design tokens
-│   ├── index.ts          # TypeScript exports (future)
-│   └── theme.css         # CSS custom properties
+│   ├── index.ts          # TypeScript exports
+│   ├── theme.css         # Aggregator (imports all token files)
+│   ├── colors.css        # Color tokens
+│   ├── spacing.css       # Spacing tokens
+│   ├── typography.css    # Font, size, weight, line-height tokens
+│   ├── radius.css        # Border radius tokens
+│   ├── shadows.css       # Shadow tokens
+│   └── transitions.css   # Transition tokens
 ├── popup/                # Popup entry point
 │   ├── App.tsx           # Popup root component
 │   ├── index.html        # Popup HTML shell
@@ -244,14 +250,14 @@ Layout
 
 ### Theme Organization
 
-| Token Group      | Examples                                      |
-| ---------------- | --------------------------------------------- |
-| `--color-*`      | `--color-bg-primary`, `--color-primary`, etc. |
-| `--space-*`      | `--space-1` (4px) through `--space-10` (40px) |
-| `--radius-*`     | `--radius-sm` (4px) through `--radius-full`   |
-| `--font-*`       | `--font-size-sm`, `--font-weight-bold`, etc.  |
-| `--shadow-*`     | `--shadow-sm`, `--shadow-md`, `--shadow-lg`   |
-| `--transition-*` | `--transition-fast`, `--transition-normal`    |
+| File              | Token Group                   | Examples                                      |
+| ----------------- | ----------------------------- | --------------------------------------------- |
+| `colors.css`      | `--color-*`                   | `--color-bg-primary`, `--color-primary`, etc. |
+| `spacing.css`     | `--space-*`                   | `--space-1` (4px) through `--space-10` (40px) |
+| `typography.css`  | `--font-*`, `--line-height-*` | `--font-size-sm`, `--font-weight-bold`        |
+| `radius.css`      | `--radius-*`                  | `--radius-sm` (4px) through `--radius-full`   |
+| `shadows.css`     | `--shadow-*`                  | `--shadow-sm`, `--shadow-md`, `--shadow-lg`   |
+| `transitions.css` | `--transition-*`              | `--transition-fast`, `--transition-normal`    |
 
 ### Messaging Compatibility
 

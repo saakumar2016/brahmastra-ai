@@ -1,4 +1,12 @@
-export {};
+// Theme tokens are defined as CSS custom properties in *.css files.
+// This module provides a TypeScript entry point for future typed
+// theme utilities (e.g., getThemeValue(), ThemeProvider, etc.).
 
-// Theme tokens are defined as CSS custom properties in theme.css
-// This file exists for any future TypeScript theme utilities
+export type ThemeToken =
+  | `--color-${string}`
+  | `--space-${string}`
+  | `--radius-${string}`
+  | `--font-${string}`
+  | `--line-height-${string}`
+  | `--shadow-${string}`
+  | `--transition-${string}`;

@@ -1,3 +1,4 @@
+import Card from "../Card";
 import styles from "./StatusCard.module.css";
 
 interface StatusItem {
@@ -11,14 +12,14 @@ interface StatusCardProps {
 
 function StatusCard({ items }: StatusCardProps) {
   return (
-    <div className={styles.card}>
+    <Card>
       {items.map((item) => (
         <div key={item.label} className={styles.row}>
           <span className={styles.label}>{item.label}</span>
           <span className={styles.value}>{item.value}</span>
         </div>
       ))}
-    </div>
+    </Card>
   );
 }
 
