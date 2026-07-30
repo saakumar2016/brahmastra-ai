@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { MessageBus } from "../shared/messaging/message-bus";
 import { MSG } from "../shared/messaging/constants";
+import { Layout, Header, Button, Card } from "../components";
+import "../styles/index.css";
 
 const bus = new MessageBus();
 
@@ -13,12 +15,18 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>Brahmastra AI</h1>
-      <p>Communication Ready</p>
-      <button onClick={handlePing}>Ping Background</button>
-      {pong && <p>PONG</p>}
-    </div>
+    <Layout>
+      <Header title="Brahmastra AI" subtitle="AI Trading Assistant" />
+      <Card>
+        <p>Communication Ready</p>
+      </Card>
+      <Button onClick={handlePing}>Ping Background</Button>
+      {pong && (
+        <Card>
+          <p>PONG</p>
+        </Card>
+      )}
+    </Layout>
   );
 }
 
