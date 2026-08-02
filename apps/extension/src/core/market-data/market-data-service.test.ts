@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { InMemoryCandleCache } from "./cache";
 import type { Candle } from "./candle";
-import type { CandleRequest, MarketDataSource } from "./data-source";
+import {
+  InvalidCandleRequestError,
+  type CandleRequest,
+  type MarketDataSource,
+} from "./data-source";
 import { MarketDataService } from "./market-data-service";
 import type { RawCandle } from "./normalize";
 
@@ -71,19 +75,27 @@ describe("MarketDataService", () => {
   it("returns a defensive copy so callers cannot mutate the cache", async () => {
     const { service, getCandles } = createService();
     const result = await service.getCandles(REQUEST);
-    result[0] = { ...result[0], open: 0 };
+    (result as Candle[])[0] = { ...result[0], open: 0 };
     const again = await service.getCandles(REQUEST);
     expect(getCandles).toHaveBeenCalledTimes(1);
     expect(again[0].open).toBe(100.5);
   });
 
-  it("throws for an invalid request without touching the source", async () => {
+  it("throws a typed error for an invalid request without touching the source", async () => {
     const { service, getCandles } = createService();
     const invalid: CandleRequest = {
       ...REQUEST,
       range: { from: 1698771600000, to: 1698768000000 },
     };
-    await expect(service.getCandles(invalid)).rejects.toThrow("Invalid candle request");
+    let error: unknown;
+    try {
+      await service.getCandles(invalid);
+    } catch (caught) {
+      error = caught;
+    }
+    expect(error).toBeInstanceOf(InvalidCandleRequestError);
+    expect((error as InvalidCandleRequestError).message).toBe("Invalid candle request");
+    expect((error as InvalidCandleRequestError).request).toEqual(invalid);
     expect(getCandles).not.toHaveBeenCalled();
   });
 

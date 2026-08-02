@@ -1,5 +1,6 @@
 import type { Candle, NumericValue, RawCandle } from "./candle";
 
+/** Parses a numeric value to a finite number, or `null` when unparseable. */
 export function parseNumber(value: NumericValue): number | null {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
@@ -31,6 +32,11 @@ function toMilliseconds(value: number): number | null {
   return value < UNIX_MS_THRESHOLD ? value * MILLISECONDS_PER_SECOND : value;
 }
 
+/**
+ * Parses a candle timestamp to Unix milliseconds, accepting ISO-8601 datetimes
+ * (with timezone), numeric strings, and Unix seconds/milliseconds. Returns
+ * `null` when the input is not a valid timestamp.
+ */
 export function parseCandleTime(value: NumericValue): number | null {
   if (typeof value === "number") {
     return toMilliseconds(value);
@@ -48,6 +54,10 @@ export function parseCandleTime(value: NumericValue): number | null {
   return toMilliseconds(Number(trimmed));
 }
 
+/**
+ * Validates and normalizes a raw candle into a {@link Candle}, or returns
+ * `null` when any field is missing, non-finite, or structurally inconsistent.
+ */
 export function normalizeCandle(input: RawCandle): Candle | null {
   const time = parseCandleTime(input.time);
   const open = parseNumber(input.open);
@@ -81,7 +91,11 @@ export function normalizeCandle(input: RawCandle): Candle | null {
   return { time, open, high, low, close, volume };
 }
 
-export function normalizeCandleSeries(input: readonly RawCandle[]): Candle[] {
+/**
+ * Normalizes a series, dropping invalid candles and duplicate timestamps
+ * (keeping the first occurrence), sorted ascending by time.
+ */
+export function normalizeCandleSeries(input: readonly RawCandle[]): readonly Candle[] {
   const seen = new Set<number>();
   const candles: Candle[] = [];
 

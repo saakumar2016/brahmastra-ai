@@ -44,12 +44,14 @@ describe("InMemoryCandleCache", () => {
   it("returns undefined for a missing key", () => {
     const cache = new InMemoryCandleCache();
     expect(cache.get("missing")).toBeUndefined();
+    expect(cache.has("missing")).toBe(false);
   });
 
   it("returns the stored candles for a present key", () => {
     const cache = new InMemoryCandleCache();
     const candles = [candle(1)];
     cache.set("key", candles);
+    expect(cache.has("key")).toBe(true);
     expect(cache.get("key")).toEqual(candles);
   });
 
