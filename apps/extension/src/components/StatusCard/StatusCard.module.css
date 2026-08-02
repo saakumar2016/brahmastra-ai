@@ -13,6 +13,7 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 
 .value {
@@ -20,4 +21,6 @@
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
 }

@@ -12,9 +12,9 @@
 | **Next Planned Version** | 0.4.0                                          |
 | **Release Target**       | Unset — next release after Milestone 04        |
 | **Current Milestone**    | 04 — Market Data Engine (🚧 In Progress)       |
-| **Current Task**         | `M04-T03` Fetch + cache                        |
-| **Last Completed Task**  | `M04-T02` Data source abstraction              |
-| **Current Branch**       | `master`                                       |
+| **Current Task**         | `M04-T04` Graceful fallback                    |
+| **Last Completed Task**  | `M04-T03` Fetch + cache                        |
+| **Current Branch**       | `pr-02`                                        |
 | **Current Focus**        | Market Data Engine — fetch + cache for candles |
 | **Current Sprint**       | None — no sprint cadence                       |
 | **Overall Status**       | On track; 3/12 milestones complete             |
@@ -32,12 +32,12 @@ All tasks for milestones 01–03 are **Completed** — see [Task Queue](TASK_QUE
 
 ## Next Task
 
-`M04-T03` — Fetch + cache for `(symbol, exchange, timeframe, range)` (`src/core/market-data/`). Status: **Ready**.
+`M04-T04` — Graceful fallback when data is unavailable (`src/core/market-data/`). Status: **Ready**.
 
 ## Development Notes
 
-- Milestone 04 is **In Progress**; `M04-T02` (Data source abstraction) is **Completed** — `MarketDataSource` seam + request types + 10 boundary tests (116 total). `M04-T03` is the next unit of work.
-- Quality gates verified **2026-08-02**: build ✅, tsc ✅, eslint ✅, 116/116 tests ✅, format ✅.
+- Milestone 04 is **In Progress**; `M04-T03` (Fetch + cache) is **Completed** — `MarketDataService` (DI source + cache), `CandleCache`/`InMemoryCandleCache`, case-insensitive `buildCandleCacheKey`, cache-miss fetch/normalize/store, defensive copies on hit, invalid-request guard + 13 tests (129 total). `M04-T04` is the next unit of work.
+- Quality gates verified **2026-08-02**: build ✅, tsc ✅, eslint ✅, 129/129 tests ✅, format ✅.
 - Known infra gap: `pnpm lint` / `pnpm typecheck` (turbo) currently run **0 tasks** — the extension package lacks `lint`/`typecheck` scripts. Tracked as `INFRA-T01` in [TASK_QUEUE.md](TASK_QUEUE.md).
 - Version drift: code (manifest + package.json) is at `0.1.0` while `docs/CHANGELOG.md` documents `0.3.0`. Tracked as `INFRA-T02`.
 

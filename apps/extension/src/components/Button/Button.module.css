@@ -7,13 +7,21 @@
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-tight);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
   white-space: nowrap;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .primary {
   background-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-text-on-primary);
 }
 
 .primary:hover {

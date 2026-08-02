@@ -32,7 +32,9 @@ function App() {
       <Card>
         <p>Communication Ready</p>
       </Card>
-      <Button onClick={handlePing}>Ping Background</Button>
+      <Button onClick={handlePing} fullWidth>
+        Ping Background
+      </Button>
       {pong && (
         <Card>
           <p>PONG</p>
