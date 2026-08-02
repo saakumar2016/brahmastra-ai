@@ -1,3 +1,2 @@
-export type { Candle } from "./candle";
-export type { RawCandle } from "./normalize";
+export type { Candle, NumericValue, RawCandle } from "./candle";
 export { normalizeCandle, normalizeCandleSeries, parseCandleTime, parseNumber } from "./normalize";

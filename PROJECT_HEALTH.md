@@ -9,7 +9,7 @@
 | Gate        | Command                                | Result  | Notes                                           |
 | ----------- | -------------------------------------- | ------- | ----------------------------------------------- |
 | Build       | `pnpm build:extension`                 | ✅ PASS | `tsc && vite build` → `apps/extension/dist`     |
-| Tests       | `pnpm test`                            | ✅ PASS | 54/54 tests, 4 files                            |
+| Tests       | `pnpm test`                            | ✅ PASS | 106/106 tests, 5 files                          |
 | Lint        | `pnpm exec eslint src/ --ext .ts,.tsx` | ✅ PASS | 0 errors (run in `apps/extension`)              |
 | Type safety | `pnpm exec tsc --noEmit`               | ✅ PASS | strict mode, 0 errors (run in `apps/extension`) |
 | Format      | `pnpm format:check`                    | ✅ PASS | Prettier clean across repo                      |
@@ -20,7 +20,7 @@
 | Area                     | Status | Detail                                                                                                   |
 | ------------------------ | ------ | -------------------------------------------------------------------------------------------------------- |
 | **Build Status**         | 🟢     | Extension builds cleanly to `dist/`.                                                                     |
-| **Tests**                | 🟢     | 54 passing (parsing, normalization, indicator alias, price).                                             |
+| **Tests**                | 🟢     | 106 passing (parsing, normalization, indicator alias, price, market data).                               |
 | **Coverage**             | 🟡     | Not instrumented; pure-logic functions are the priority for future coverage.                             |
 | **Lint**                 | 🟢     | Direct eslint clean; see Known Issues for the turbo gap.                                                 |
 | **Type Safety**          | 🟢     | Strict TS, no `any`, exhaustive unions.                                                                  |

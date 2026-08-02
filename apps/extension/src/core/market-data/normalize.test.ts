@@ -64,6 +64,14 @@ describe("parseNumber", () => {
     expect(parseNumber("--")).toBeNull();
   });
 
+  it("returns null for a number followed by junk", () => {
+    expect(parseNumber("12abc")).toBeNull();
+  });
+
+  it("returns null for thousand-separated strings", () => {
+    expect(parseNumber("1,234")).toBeNull();
+  });
+
   it("returns null for NaN and Infinity strings", () => {
     expect(parseNumber("NaN")).toBeNull();
     expect(parseNumber("Infinity")).toBeNull();
@@ -94,6 +102,42 @@ describe("parseCandleTime", () => {
 
   it("parses an ISO 8601 datetime string", () => {
     expect(parseCandleTime("2023-10-31T16:00:00.000Z")).toBe(1698768000000);
+  });
+
+  it("parses ISO datetime with fractional seconds", () => {
+    expect(parseCandleTime("2023-10-31T16:00:00.123Z")).toBe(1698768000123);
+  });
+
+  it("parses ISO datetime with a numeric timezone offset", () => {
+    expect(parseCandleTime("2023-10-31T21:30:00+05:30")).toBe(1698768000000);
+  });
+
+  it("parses ISO datetime with lowercase t/z", () => {
+    expect(parseCandleTime("2023-10-31t16:00:00z")).toBe(1698768000000);
+  });
+
+  it("rejects a date-only string", () => {
+    expect(parseCandleTime("2023-10-31")).toBeNull();
+  });
+
+  it("rejects ISO datetime without a timezone", () => {
+    expect(parseCandleTime("2023-10-31T16:00:00")).toBeNull();
+  });
+
+  it("rejects ISO datetime with an invalid calendar date", () => {
+    expect(parseCandleTime("2023-13-01T00:00:00Z")).toBeNull();
+  });
+
+  it("treats the sub-threshold value as seconds", () => {
+    expect(parseCandleTime(999999999999)).toBe(999999999999000);
+  });
+
+  it("treats the threshold value as milliseconds", () => {
+    expect(parseCandleTime(1e12)).toBe(1e12);
+  });
+
+  it("passes very large millisecond timestamps through", () => {
+    expect(parseCandleTime(1e13)).toBe(1e13);
   });
 
   it("returns null for an empty string", () => {
@@ -142,6 +186,20 @@ describe("normalizeCandle", () => {
   it("accepts a zero volume", () => {
     const raw: RawCandle = { ...VALID_RAW, volume: "0" };
     expect(normalizeCandle(raw)?.volume).toBe(0);
+  });
+
+  it("accepts a high equal to close", () => {
+    const raw: RawCandle = { ...VALID_RAW, high: "104.2" };
+    expect(normalizeCandle(raw)).toEqual({ ...VALID_CANDLE, high: 104.2 });
+  });
+
+  it("accepts a low equal to open", () => {
+    const raw: RawCandle = { ...VALID_RAW, low: "100.5" };
+    expect(normalizeCandle(raw)).toEqual({ ...VALID_CANDLE, low: 100.5 });
+  });
+
+  it("rejects an empty-string field", () => {
+    expect(normalizeCandle({ ...VALID_RAW, volume: "" })).toBeNull();
   });
 
   it("rejects a high below close", () => {

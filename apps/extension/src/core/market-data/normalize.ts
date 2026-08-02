@@ -1,15 +1,6 @@
-import type { Candle } from "./candle";
+import type { Candle, NumericValue, RawCandle } from "./candle";
 
-export interface RawCandle {
-  time: number | string;
-  open: number | string;
-  high: number | string;
-  low: number | string;
-  close: number | string;
-  volume: number | string;
-}
-
-export function parseNumber(value: number | string): number | null {
+export function parseNumber(value: NumericValue): number | null {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
   }
@@ -22,20 +13,25 @@ export function parseNumber(value: number | string): number | null {
 }
 
 const MILLISECONDS_PER_SECOND = 1000;
+const UNIX_MS_THRESHOLD = 1e12;
+
+const ISO_8601_DATETIME_PATTERN =
+  /^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/;
 
 function isValidTimestamp(value: number): boolean {
   return Number.isInteger(value) && value > 0;
 }
 
-// Sources disagree on units: treat sub-1e12 (seconds) as needing conversion, >= 1e12 as millis.
+// Sources disagree on units: treat sub-threshold values (Unix seconds) as needing
+// conversion, >= threshold as milliseconds.
 function toMilliseconds(value: number): number | null {
   if (!isValidTimestamp(value)) {
     return null;
   }
-  return value < 1e12 ? value * MILLISECONDS_PER_SECOND : value;
+  return value < UNIX_MS_THRESHOLD ? value * MILLISECONDS_PER_SECOND : value;
 }
 
-export function parseCandleTime(value: number | string): number | null {
+export function parseCandleTime(value: NumericValue): number | null {
   if (typeof value === "number") {
     return toMilliseconds(value);
   }
@@ -43,9 +39,11 @@ export function parseCandleTime(value: number | string): number | null {
   if (trimmed === "") {
     return null;
   }
-  const isoMillis = Date.parse(trimmed);
-  if (Number.isFinite(isoMillis)) {
-    return isoMillis;
+  if (ISO_8601_DATETIME_PATTERN.test(trimmed)) {
+    const isoMillis = Date.parse(trimmed);
+    if (Number.isFinite(isoMillis)) {
+      return isoMillis;
+    }
   }
   return toMilliseconds(Number(trimmed));
 }
@@ -89,6 +87,7 @@ export function normalizeCandleSeries(input: readonly RawCandle[]): Candle[] {
 
   for (const raw of input) {
     const candle = normalizeCandle(raw);
+    // Fail partial: drop invalid candles; keep the first valid candle per timestamp.
     if (candle === null || seen.has(candle.time)) {
       continue;
     }
