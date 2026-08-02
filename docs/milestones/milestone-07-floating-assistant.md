@@ -23,6 +23,18 @@ Decisions happen on the chart. A persistent overlay keeps the trader's context, 
 - Strategy results + unified signal view
 - Position/size persistence
 
+## Task Checklist
+
+| Task ID | Title                                  | Priority | Size | Deps         | Status |
+| ------- | -------------------------------------- | -------- | ---- | ------------ | ------ |
+| M07-T01 | Overlay shell (draggable, collapsible) | High     | M    | M02-T03      | Ready  |
+| M07-T02 | Live context view                      | High     | M    | M07-T01, M03 | Ready  |
+| M07-T03 | Strategy + signal view                 | High     | M    | M07-T01, M06 | Ready  |
+| M07-T04 | Position/size persistence              | Medium   | S    | M07-T01      | Ready  |
+| M07-T05 | Integration tests + accessibility      | Medium   | M    | M07-T02..04  | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Chat (AI Assistant, Milestone 11)

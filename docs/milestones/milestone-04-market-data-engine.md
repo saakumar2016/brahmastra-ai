@@ -24,6 +24,19 @@ Chart context (03) tells us _what_ is on the chart; strategies need _history_ to
 - Graceful fallback when data is unavailable
 - Unit tests for parsing, normalization, and cache logic
 
+## Task Checklist
+
+| Task ID | Title                                                    | Priority | Size | Deps          | Status |
+| ------- | -------------------------------------------------------- | -------- | ---- | ------------- | ------ |
+| M04-T01 | Candle/OHLCV model + normalization                       | High     | M    | M03 (context) | Ready  |
+| M04-T02 | Data source abstraction (swappable page/backend)         | High     | M    | M04-T01       | Ready  |
+| M04-T03 | Fetch + cache for `(symbol, exchange, timeframe, range)` | High     | M    | M04-T02       | Ready  |
+| M04-T04 | Graceful fallback when data is unavailable               | Medium   | S    | M04-T03       | Ready  |
+| M04-T05 | Unit + integration tests (parsing, normalization, cache) | High     | M    | M04-T01..04   | Ready  |
+| M04-T06 | Update docs: entities, feature doc, changelog            | Medium   | S    | M04-T05       | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md). Next task: **M04-T01**.
+
 ## Out of Scope
 
 - Real-time tick execution

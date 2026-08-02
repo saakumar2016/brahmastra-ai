@@ -2,7 +2,7 @@
 
 > **Purpose:** The 12 delivery milestones, their template, dependencies, and status.
 > **Last Updated:** 2026-08-02
-> **Related Documents:** [Roadmap](roadmap.md) · [Master Spec](../MASTER_SPEC.md) · [Milestones detail](../milestones/) · [Product Backlog](../PRODUCT_BACKLOG.md)
+> **Related Documents:** [Roadmap](roadmap.md) · [Master Spec](../MASTER_SPEC.md) · [Milestones detail](../milestones/) · [Product Backlog](../PRODUCT_BACKLOG.md) · [Task Queue](../../TASK_QUEUE.md) · [Roadmap Progress](../../ROADMAP_PROGRESS.md)
 
 ## What Is a Milestone?
 
@@ -12,6 +12,7 @@ A milestone is a delivery unit with a clear objective, acceptance criteria, and 
 - **Objective** — one sentence about the goal.
 - **Background** — why this milestone exists and what preceded it.
 - **Deliverables** — concrete artifacts.
+- **Task Checklist** — the executable tasks (Task ID, Priority, Size, Dependencies, Status). Task status is authoritative in [`TASK_QUEUE.md`](../../TASK_QUEUE.md).
 - **Out of Scope** — explicit exclusions.
 - **Dependencies** — milestones and modules it relies on.
 - **Folder Changes** — where the code lands.

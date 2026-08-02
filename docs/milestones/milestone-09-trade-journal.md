@@ -24,6 +24,18 @@ Consistent trading requires feedback. A journal turns decisions into data and li
 - Filters (market, timeframe, date range)
 - Watchlist management
 
+## Task Checklist
+
+| Task ID | Title                                             | Priority | Size | Deps    | Status |
+| ------- | ------------------------------------------------- | -------- | ---- | ------- | ------ |
+| M09-T01 | Journal entities + local-first storage            | High     | L    | M06     | Ready  |
+| M09-T02 | Trade entry (manual)                              | High     | M    | M09-T01 | Ready  |
+| M09-T03 | Per-strategy stats (win rate, expectancy, avg RR) | High     | M    | M09-T01 | Ready  |
+| M09-T04 | Filters (market, timeframe, date range)           | Medium   | M    | M09-T01 | Ready  |
+| M09-T05 | Watchlist management                              | Medium   | M    | M09-T01 | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Trade advice

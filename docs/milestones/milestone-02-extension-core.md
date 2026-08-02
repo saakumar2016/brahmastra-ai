@@ -24,6 +24,21 @@ With the workspace foundation (01) in place, the product needed a working shell 
 - Detection layer: `PageDetection` types, `TradingViewDetector`, `DetectionService`, `DetectionStore`, content `page-watcher`
 - Detection status UI in Popup and Side Panel
 
+## Task Checklist
+
+| Task ID | Title                                                        | Priority | Size | Deps             | Status    |
+| ------- | ------------------------------------------------------------ | -------- | ---- | ---------------- | --------- |
+| M02-T01 | MV3 manifest + Vite build wiring                             | High     | M    | M01-T04          | Completed |
+| M02-T02 | Theme tokens + base styles                                   | Medium   | M    | M02-T01          | Completed |
+| M02-T03 | Shared components (Button, Card, Header, Layout, StatusCard) | Medium   | L    | M02-T02          | Completed |
+| M02-T04 | Messaging layer (`MessageBus`, `MSG`)                        | High     | M    | M02-T01          | Completed |
+| M02-T05 | Detection types + `TradingViewDetector`                      | High     | M    | M02-T04          | Completed |
+| M02-T06 | `DetectionService` + `DetectionStore` (background)           | High     | M    | M02-T05          | Completed |
+| M02-T07 | Content `page-watcher`                                       | Medium   | S    | M02-T05          | Completed |
+| M02-T08 | Popup + Side Panel detection UI                              | Medium   | M    | M02-T03, M02-T06 | Completed |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Context extraction

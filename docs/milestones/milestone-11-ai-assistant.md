@@ -24,6 +24,18 @@ Rule engines are deterministic but not conversational. The AI Assistant adds nat
 - Citations / "I don't know" behavior
 - Backend AI endpoint as the default accelerator (offline-capable extension)
 
+## Task Checklist
+
+| Task ID | Title                                     | Priority | Size | Deps         | Status |
+| ------- | ----------------------------------------- | -------- | ---- | ------------ | ------ |
+| M11-T01 | AI service (swappable LLM provider)       | High     | M    | M06, M09     | Ready  |
+| M11-T02 | Grounded prompt assembly + filtering      | High     | L    | M11-T01, M04 | Ready  |
+| M11-T03 | Chat UI (Floating Assistant / Side Panel) | High     | M    | M11-T01, M07 | Ready  |
+| M11-T04 | Citations + "I don't know" behavior       | High     | M    | M11-T02      | Ready  |
+| M11-T05 | Backend AI endpoint wiring                | Medium   | M    | M11-T02      | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Unverifiable predictions presented as fact

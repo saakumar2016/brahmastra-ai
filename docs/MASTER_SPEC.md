@@ -2,7 +2,7 @@
 
 > **Purpose:** The single source of truth for Brahmastra AI — product, architecture, standards, and workflow. Future documents reference this instead of repeating content.
 > **Last Updated:** 2026-08-02
-> **Related Documents:** [Docs index](README.md) · [Roadmap](00-project/roadmap.md) · [Milestones](00-project/milestones.md) · [CLAUDE.md](../CLAUDE.md)
+> **Related Documents:** [Docs index](README.md) · [Constitution](../BRAHMASTRA_CONSTITUTION.md) · [CLAUDE.md](../CLAUDE.md) · [Project State](../PROJECT_STATE.md) · [Task Queue](../TASK_QUEUE.md) · [Roadmap](00-project/roadmap.md) · [Milestones](00-project/milestones.md)
 
 ---
 
@@ -133,13 +133,15 @@ brahmastra-ai/
 
 ## 11. Development Workflow
 
-1. Pick work from [`PRODUCT_BACKLOG.md`](PRODUCT_BACKLOG.md) or the current milestone.
+Work is executed through the **[Engineering Workflow](#15-engineering-workflow)** (section 15), driven by the task life cycle in [`TASK_QUEUE.md`](../TASK_QUEUE.md):
+
+1. Pick the highest-priority **Ready** task from the current milestone (see [`TASK_QUEUE.md`](../TASK_QUEUE.md) and [`PROJECT_STATE.md`](../PROJECT_STATE.md)).
 2. Implement with DI + pure logic in `src/core/`, UI in `src/ui|popup|sidepanel`.
 3. Add/update tests; run the verification gates (build, typecheck, lint, tests, format).
-4. Update documentation and the changelog.
+4. Update documentation, the changelog, and the project-state files.
 5. Merge via PR; Definition of Done must be met.
 
-> Details: [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md)
+> Details: [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md) · [`CLAUDE.md`](../CLAUDE.md) · [section 15](#15-engineering-workflow)
 
 ## 12. Release Strategy
 
@@ -175,3 +177,32 @@ brahmastra-ai/
 - Push notifications via the backend.
 - Additional brokers, advanced order types.
 - Low priority: social trading, mobile companion app.
+
+## 15. Engineering Workflow
+
+Every unit of work flows through the same loop. The loop is executed **one task at a time** and driven by the autonomous "work next" command (see [`CLAUDE.md`](../CLAUDE.md)).
+
+```
+Milestone
+  └─▶ Task Queue        pick highest-priority Ready task (TASK_QUEUE.md)
+       └─▶ Architecture Review   check docs/01-architecture + related ADR
+            └─▶ Implementation    exactly one task; DI + src/core/, UI via background contract
+                 └─▶ Testing      unit/integration; partial-failure paths included
+                      └─▶ Documentation   feature/milestone doc + ADR if decision
+                           └─▶ Review      Definition of Done gates + code-review checklist
+                                └─▶ Update Project State   PROJECT_STATE.md
+                                     └─▶ Update Task Queue  TASK_QUEUE.md (move task to Completed)
+                                          └─▶ Update Roadmap ROADMAP_PROGRESS.md + CHANGELOG.md
+                                               └─▶ Stop — wait for approval
+```
+
+Rules of the loop:
+
+- **One task per iteration.** Never combine tasks.
+- **Dependencies verified before starting** — the task's deps must be `Completed` in `TASK_QUEUE.md`.
+- **Architecture review before code** — confirm the change fits the documented architecture; update ADR/docs when it does not.
+- **Documentation updates are part of the task**, not an afterthought.
+- **State files stay current** — `PROJECT_STATE.md`, `TASK_QUEUE.md`, `ROADMAP_PROGRESS.md`, `PROJECT_HEALTH.md` are updated in the same iteration.
+- **Stop and summarize** — the next iteration is a separate, explicit request.
+
+> Details: [`TASK_QUEUE.md`](../TASK_QUEUE.md) · [`CLAUDE.md`](../CLAUDE.md) · [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md) · [`06-testing/testing-strategy.md`](06-testing/testing-strategy.md)

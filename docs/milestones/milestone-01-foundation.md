@@ -24,6 +24,18 @@ Brahmastra AI would grow from a single extension into multiple packages (core en
 - `docs/` documentation structure
 - Placeholder `apps/extension` scaffold
 
+## Task Checklist
+
+| Task ID | Title                                       | Priority | Size | Deps    | Status    |
+| ------- | ------------------------------------------- | -------- | ---- | ------- | --------- |
+| M01-T01 | pnpm workspace + Turbo task runner          | High     | M    | —       | Completed |
+| M01-T02 | Shared tsconfig / ESLint / Prettier configs | High     | M    | M01-T01 | Completed |
+| M01-T03 | Husky + lint-staged hooks                   | Medium   | S    | M01-T02 | Completed |
+| M01-T04 | `apps/extension` scaffold                   | High     | M    | M01-T01 | Completed |
+| M01-T05 | `docs/` structure + README                  | Medium   | M    | M01-T01 | Completed |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Any extension functionality

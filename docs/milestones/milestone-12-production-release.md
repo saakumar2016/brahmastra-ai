@@ -24,6 +24,18 @@ A great engine is only useful if it ships safely. This milestone closes security
 - Store listing, privacy policy, support docs
 - Feature flags for safe rollouts
 
+## Task Checklist
+
+| Task ID | Title                                       | Priority | Size | Deps        | Status |
+| ------- | ------------------------------------------- | -------- | ---- | ----------- | ------ |
+| M12-T01 | Production hardening (checklist)            | High     | L    | all M01–M11 | Ready  |
+| M12-T02 | E2E smoke suite                             | High     | M    | M12-T01     | Ready  |
+| M12-T03 | Release automation (tag, package, submit)   | High     | M    | M12-T01     | Ready  |
+| M12-T04 | Store listing, privacy policy, support docs | Medium   | M    | M12-T01     | Ready  |
+| M12-T05 | Feature flags + rollback path               | Medium   | M    | M12-T01     | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - New features

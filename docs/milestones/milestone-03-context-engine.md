@@ -28,6 +28,23 @@ Detection (02) tells us _that_ we are on a chart; the Context Engine tells us _w
 - Debounced extraction scheduling (~500ms) with immediate first-load extraction
 - Unit tests for all pure parsing/utility logic
 
+## Task Checklist
+
+| Task ID | Title                                       | Priority | Size | Deps        | Status    |
+| ------- | ------------------------------------------- | -------- | ---- | ----------- | --------- |
+| M03-T01 | `ChartContext` / `IndicatorInfo` types      | High     | S    | M02-T05     | Completed |
+| M03-T02 | `DomReader` + `CONTEXT_SELECTORS`           | High     | M    | M03-T01     | Completed |
+| M03-T03 | `SymbolDetector`                            | High     | M    | M03-T02     | Completed |
+| M03-T04 | `IndicatorDetector` + indicator registry    | High     | M    | M03-T02     | Completed |
+| M03-T05 | `PriceDetector`                             | Medium   | S    | M03-T02     | Completed |
+| M03-T06 | `MarketDetector`                            | Medium   | S    | M03-T02     | Completed |
+| M03-T07 | `ChartContextExtractor` facade (DI)         | High     | M    | M03-T03..06 | Completed |
+| M03-T08 | `Logger` abstraction + `text-utils`         | High     | S    | —           | Completed |
+| M03-T09 | Extraction scheduler (debounce + immediate) | High     | M    | M03-T07     | Completed |
+| M03-T10 | Unit tests for parsing / utilities (54)     | High     | M    | M03-T03..09 | Completed |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Candle scraping

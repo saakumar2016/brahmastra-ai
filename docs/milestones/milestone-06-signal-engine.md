@@ -24,6 +24,18 @@ Multiple strategies will disagree. The Signal Engine aggregates them into one ac
 - `SignalBadge` / `StrategyCard` UI components
 - Watchlist evaluation path (basis for the scanner)
 
+## Task Checklist
+
+| Task ID | Title                                 | Priority | Size | Deps    | Status |
+| ------- | ------------------------------------- | -------- | ---- | ------- | ------ |
+| M06-T01 | `Signal` types + contributions        | High     | S    | M05     | Ready  |
+| M06-T02 | Aggregation + confidence scoring      | High     | L    | M06-T01 | Ready  |
+| M06-T03 | `SignalBadge` / `StrategyCard` UI     | Medium   | M    | M06-T02 | Ready  |
+| M06-T04 | Watchlist evaluation path             | Medium   | M    | M06-T02 | Ready  |
+| M06-T05 | Tests (determinism, confidence edges) | High     | M    | M06-T02 | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Order placement

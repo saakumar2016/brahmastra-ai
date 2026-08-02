@@ -25,6 +25,18 @@ The Strategy Engine is the heart of Brahmastra AI. Every future feature (AI, not
 - Strategy Configuration
 - Rule Evaluation
 
+## Task Checklist
+
+| Task ID | Title                                             | Priority | Size | Deps        | Status |
+| ------- | ------------------------------------------------- | -------- | ---- | ----------- | ------ |
+| M05-T01 | `Strategy` interface + `StrategyResult` types     | High     | M    | M03, M04    | Ready  |
+| M05-T02 | Strategy registry                                 | High     | S    | M05-T01     | Ready  |
+| M05-T03 | Strategy manager + configuration validation       | High     | M    | M05-T01     | Ready  |
+| M05-T04 | Rule evaluation building blocks                   | Medium   | L    | M05-T01     | Ready  |
+| M05-T05 | Sample strategies (trend, mean-reversion) + tests | Medium   | M    | M05-T03..04 | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - AI

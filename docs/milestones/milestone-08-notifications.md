@@ -25,6 +25,18 @@ Traders cannot watch every chart. Notifications turn the engine into an always-o
 - System notifications (`chrome.notifications`)
 - Click-through to the relevant chart
 
+## Task Checklist
+
+| Task ID | Title                                    | Priority | Size | Deps    | Status |
+| ------- | ---------------------------------------- | -------- | ---- | ------- | ------ |
+| M08-T01 | Notification types + notification center | High     | M    | M06     | Ready  |
+| M08-T02 | Watch conditions (symbol × strategy)     | High     | M    | M08-T01 | Ready  |
+| M08-T03 | Scheduled background evaluation (alarms) | High     | M    | M08-T02 | Ready  |
+| M08-T04 | Deduplication + rate limiting            | High     | S    | M08-T03 | Ready  |
+| M08-T05 | System notifications + click-through     | Medium   | M    | M08-T03 | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Order placement

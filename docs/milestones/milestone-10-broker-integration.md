@@ -25,6 +25,18 @@ Analysis without execution leaves the loop open. Broker integration completes th
 - Risk guardrails (max risk/trade, daily limits) checked pre-execution
 - Dry-run mode
 
+## Task Checklist
+
+| Task ID | Title                                      | Priority | Size | Deps     | Status |
+| ------- | ------------------------------------------ | -------- | ---- | -------- | ------ |
+| M10-T01 | Broker interface (broker-agnostic)         | High     | M    | M06, M09 | Ready  |
+| M10-T02 | Zerodha Kite driver                        | High     | L    | M10-T01  | Ready  |
+| M10-T03 | Instrument-token mapping                   | High     | M    | M10-T01  | Ready  |
+| M10-T04 | Order ticket UI with explicit confirmation | High     | M    | M10-T01  | Ready  |
+| M10-T05 | Risk guardrails + dry-run mode             | High     | M    | M10-T01  | Ready  |
+
+> Status is authoritative in [`../../TASK_QUEUE.md`](../../TASK_QUEUE.md).
+
 ## Out of Scope
 
 - Unattended/auto trading
