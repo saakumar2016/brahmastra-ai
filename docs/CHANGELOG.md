@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Milestone 04 — Market Data Engine groundwork (in progress): candle model, data source abstraction, caching. See [milestone-04](milestones/milestone-04-market-data-engine.md).
 - `M04-T01` — Candle/OHLCV model + normalization (`src/core/market-data/`): canonical `Candle` type, `RawCandle` input, `parseNumber`, `parseCandleTime`, `normalizeCandle`, `normalizeCandleSeries` (validate, drop invalid, dedupe by time, sort ascending) + 52 unit tests.
 - `M04-T01` review refinement: `parseCandleTime` now accepts only strict ISO-8601 datetimes (with timezone) or Unix seconds/ms; `Candle`/`RawCandle` are `readonly` value objects; shared `NumericValue` alias.
+- `M04-T02` — Data source abstraction: `MarketDataSource` interface, `Instrument`, `CandleRange`, `CandleRequest` types, `isValidCandleRequest` boundary guard + 10 tests.
 
 ## [0.3.0] — 2026-08-02 — Milestone 03: TradingView Context Engine
 

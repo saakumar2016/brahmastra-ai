@@ -78,7 +78,7 @@ Status values: `Ready` · `In Progress` · `Review` · `Completed`.
 | Task ID | Title                                                    | Priority | Size | Deps          | Status    |
 | ------- | -------------------------------------------------------- | -------- | ---- | ------------- | --------- |
 | M04-T01 | Candle/OHLCV model + normalization                       | High     | M    | M03 (context) | Completed |
-| M04-T02 | Data source abstraction (swappable page/backend)         | High     | M    | M04-T01       | Ready     |
+| M04-T02 | Data source abstraction (swappable page/backend)         | High     | M    | M04-T01       | Completed |
 | M04-T03 | Fetch + cache for `(symbol, exchange, timeframe, range)` | High     | M    | M04-T02       | Ready     |
 | M04-T04 | Graceful fallback when data is unavailable               | Medium   | S    | M04-T03       | Ready     |
 | M04-T05 | Unit + integration tests (parsing, normalization, cache) | High     | M    | M04-T01..04   | Ready     |

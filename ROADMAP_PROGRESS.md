@@ -10,7 +10,7 @@
 | ------------------------ | ----------------------------------------------- |
 | **Milestones done**      | 3 / 12                                          |
 | **Overall progress**     | **25%**                                         |
-| **Current**              | 04 — Market Data Engine (In Progress, 17% done) |
+| **Current**              | 04 — Market Data Engine (In Progress, 33% done) |
 | **Remaining**            | 9 milestones (05–12)                            |
 | **Estimated completion** | ≈ 35 focused sessions (see below)               |
 
@@ -23,7 +23,7 @@
 | 01  | Foundation                    | ✅ Completed   | 100%     | —                |
 | 02  | Chrome Extension Core         | ✅ Completed   | 100%     | —                |
 | 03  | TradingView Context Engine    | ✅ Completed   | 100%     | —                |
-| 04  | Market Data Engine            | 🚧 In Progress | 17%      | ≈ 4 sessions     |
+| 04  | Market Data Engine            | 🚧 In Progress | 33%      | ≈ 4 sessions     |
 | 05  | Strategy Engine               | ⏳ Not Started | 0%       | ≈ 4 sessions     |
 | 06  | Signal Engine                 | ⏳ Not Started | 0%       | ≈ 4 sessions     |
 | 07  | Floating Assistant            | ⏳ Not Started | 0%       | ≈ 3 sessions     |
