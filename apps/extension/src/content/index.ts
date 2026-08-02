@@ -1,3 +1,5 @@
+import { ContextExtractor } from "../core/context/context-extractor";
+import { contextLog } from "../core/context/logging";
 import { DetectionService } from "../shared/detection/detection-service";
 import { TradingViewDetector } from "../shared/detection/tradingview-detector";
 import type { PageDetection } from "../shared/detection/types";
@@ -7,16 +9,34 @@ import { watchPageChanges } from "./page-watcher";
 
 const bus = new MessageBus();
 const detectionService = new DetectionService([new TradingViewDetector()]);
+const contextExtractor = new ContextExtractor();
 
 let lastDetection: PageDetection | null = null;
+let isExtracting = false;
 
-function sendDetection(): void {
+function runDetection(): void {
   const detection = detectionService.detect(document, new URL(window.location.href));
-  if (JSON.stringify(detection) === JSON.stringify(lastDetection)) {
+  if (JSON.stringify(detection) !== JSON.stringify(lastDetection)) {
+    lastDetection = detection;
+    bus.send({ type: MSG.PAGE_DETECTED, payload: detection });
+  }
+
+  if (detection.supported) {
+    void extractContext();
+  }
+}
+
+async function extractContext(): Promise<void> {
+  if (isExtracting) {
     return;
   }
-  lastDetection = detection;
-  bus.send({ type: MSG.PAGE_DETECTED, payload: detection });
+  isExtracting = true;
+  try {
+    const context = await contextExtractor.getChartContext();
+    contextLog(`Chart context: ${JSON.stringify(context)}`);
+  } finally {
+    isExtracting = false;
+  }
 }
 
 async function main(): Promise<void> {
@@ -27,8 +47,8 @@ async function main(): Promise<void> {
     console.log("Brahmastra content script loaded");
   }
 
-  sendDetection();
-  watchPageChanges(sendDetection);
+  runDetection();
+  watchPageChanges(runDetection);
 }
 
 main();

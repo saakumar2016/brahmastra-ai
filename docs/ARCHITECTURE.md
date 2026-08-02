@@ -287,6 +287,79 @@ The **background service worker** is the single source of truth for detection st
 
 ---
 
+## Context Extraction Architecture (Milestone 6)
+
+When a supported chart page is detected, the **Context Extraction Engine** collects structured data from the TradingView DOM. It performs no analysis — it only gathers data for future AI milestones.
+
+### Design
+
+The engine follows SOLID principles. Each detector has a single responsibility and depends on the `DomReader` abstraction (dependency inversion). `ContextExtractor` is the facade that orchestrates all detectors and exposes a single async method:
+
+```
+getChartContext(): Promise<ChartContext>
+```
+
+- **DomReader** wraps all DOM access (`query`, `queryAll`, `text`, `exists`, plus scoped variants) so selectors can be changed in one place and reads never throw.
+- **Detectors** extract one facet each: symbol/timeframe/chart type, indicators, price, market status.
+- **Legend items are queried once** by the orchestrator and shared between the indicator and price detectors to avoid duplicate DOM lookups.
+- **Error handling** — no exceptions propagate. Detectors return partial/empty data and `ContextExtractor` falls back to a partial `ChartContext` if anything unexpected throws.
+
+### Folder Structure
+
+```
+apps/extension/src/core/context/
+├── index.ts               # Barrel export
+├── chart-context.ts       # ChartContext, IndicatorInfo, MarketStatus types
+├── context-extractor.ts   # Orchestrator facade (getChartContext)
+├── dom-reader.ts          # Reusable DOM utilities
+├── selectors.ts           # Centralized TradingView DOM selectors
+├── normalize.ts           # Text normalization helpers
+├── logging.ts             # [Context] debug logger
+├── symbol-detector.ts     # Symbol, exchange, timeframe, chart type
+├── indicator-detector.ts  # Visible indicator names + parameters
+├── price-detector.ts      # Visible price (best effort)
+└── market-detector.ts     # Market open/closed (best effort)
+```
+
+### Extraction Flow
+
+```
+ContextExtractor.getChartContext()
+│
+├── SymbolDetector.extract(url)        → symbol, exchange, timeframe, chartType
+├── queryAll(legend items)  (once)
+│   ├── IndicatorDetector.extract()    → indicators[] (name + parameters)
+│   └── PriceDetector.extract()        → visiblePrice | undefined
+├── MarketDetector.extract()           → marketStatus | undefined
+│
+└── ChartContext (timestamped)
+```
+
+The content script runs this service on every detected page change (throttled and debounced), and debug-logs the result under the `[Context]` prefix.
+
+### Detector Responsibilities
+
+| Detector            | Responsibility                            | Unavailable behavior         |
+| ------------------- | ----------------------------------------- | ---------------------------- |
+| `SymbolDetector`    | symbol, exchange, timeframe, chart type   | empty string, title fallback |
+| `IndicatorDetector` | indicator name + parameters from legend   | excluded from the array      |
+| `PriceDetector`     | visible price from the main legend values | `undefined`                  |
+| `MarketDetector`    | open/closed from header status elements   | `undefined`                  |
+
+### Data Sources
+
+Only information already present in the page is used — the URL query string (`symbol`, `interval`, `chartType`) and the TradingView DOM (header breadcrumb, timeframe/chart-type toolbars, legend). No candles are scraped, no undocumented APIs are called.
+
+### Logging
+
+Debug logs use the `[Context]` prefix and include extracted symbol, timeframe, indicator count, and extraction time.
+
+### Future Compatibility
+
+`ChartContext` is designed so later milestones can extend it (OHLC, support/resistance, trend, patterns, broker positions, watchlist, news) without breaking existing consumers — new fields are added as optional members.
+
+---
+
 ## UI Architecture (Milestone 4)
 
 The extension UI is built with React, CSS Modules, and a centralized CSS custom property theme. No CSS frameworks are used.

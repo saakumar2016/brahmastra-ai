@@ -83,6 +83,36 @@ The extension detects whether the active tab is a supported TradingView page and
 
 Fields are shown as **Unavailable** when the data cannot be determined from the page (e.g. the symbol is not present in the URL).
 
+### TradingView Context Extraction
+
+When a supported chart page is detected, the content script runs the **Context Extraction Engine** (`src/core/context/`) which collects structured chart data from the TradingView DOM. It does **not** perform analysis — it only gathers data for future AI milestones.
+
+**Extracted data (`ChartContext`)**
+
+| Field          | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| `symbol`       | Instrument symbol (e.g. `BTCUSDT`)                           |
+| `exchange`     | Exchange (e.g. `BINANCE`), empty when unavailable            |
+| `timeframe`    | Chart timeframe (e.g. `15`, `1H`, `1D`)                      |
+| `chartType`    | Chart style (e.g. Candles, Bars, Line)                       |
+| `url`          | Current page URL                                             |
+| `indicators`   | Visible indicator names + parameters (e.g. `EMA`, `RSI`)     |
+| `visiblePrice` | Last visible price (optional, `undefined` when unavailable)  |
+| `marketStatus` | `open` / `closed` (optional, `undefined` when indeterminate) |
+| `timestamp`    | Extraction timestamp (epoch ms)                              |
+
+**Verifying context extraction**
+
+1. Open DevTools console on a TradingView chart page
+2. Look for `[Context]` debug logs:
+   - `Extracted Symbol: ...`
+   - `Extracted Timeframe: ...`
+   - `Extracted Indicators: ...`
+   - `Extraction Time: ...ms`
+   - `Chart context: { ... }`
+
+DOM selectors are centralized in `src/core/context/selectors.ts` — update them there when TradingView changes its DOM.
+
 ## Scripts
 
 | Script                 | Description                          |
@@ -102,6 +132,8 @@ brahmastra-ai/
 │   └── extension/       # Chrome Extension (Manifest V3)
 │       └── src/
 │           ├── components/   # Reusable UI components
+│           ├── core/         # Core engine (context extraction)
+│           │   └── context/  # Chart context extraction layer
 │           ├── styles/       # Global base styles
 │           ├── theme/        # Centralized CSS theme tokens
 │           ├── popup/        # Popup React app
