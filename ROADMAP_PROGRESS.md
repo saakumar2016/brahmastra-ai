@@ -6,13 +6,13 @@
 
 ## Overall Progress
 
-| Metric                   | Value                                          |
-| ------------------------ | ---------------------------------------------- |
-| **Milestones done**      | 3 / 12                                         |
-| **Overall progress**     | **25%**                                        |
-| **Current**              | 04 — Market Data Engine (In Progress, 0% done) |
-| **Remaining**            | 9 milestones (05–12)                           |
-| **Estimated completion** | ≈ 35 focused sessions (see below)              |
+| Metric                   | Value                                           |
+| ------------------------ | ----------------------------------------------- |
+| **Milestones done**      | 3 / 12                                          |
+| **Overall progress**     | **25%**                                         |
+| **Current**              | 04 — Market Data Engine (In Progress, 17% done) |
+| **Remaining**            | 9 milestones (05–12)                            |
+| **Estimated completion** | ≈ 35 focused sessions (see below)               |
 
 > Overall % is milestone-count-weighted (each milestone = 1/12). Milestone % reflects completed tasks within that milestone from [TASK_QUEUE.md](TASK_QUEUE.md).
 
@@ -23,7 +23,7 @@
 | 01  | Foundation                    | ✅ Completed   | 100%     | —                |
 | 02  | Chrome Extension Core         | ✅ Completed   | 100%     | —                |
 | 03  | TradingView Context Engine    | ✅ Completed   | 100%     | —                |
-| 04  | Market Data Engine            | 🚧 In Progress | 0%       | ≈ 4 sessions     |
+| 04  | Market Data Engine            | 🚧 In Progress | 17%      | ≈ 4 sessions     |
 | 05  | Strategy Engine               | ⏳ Not Started | 0%       | ≈ 4 sessions     |
 | 06  | Signal Engine                 | ⏳ Not Started | 0%       | ≈ 4 sessions     |
 | 07  | Floating Assistant            | ⏳ Not Started | 0%       | ≈ 3 sessions     |
