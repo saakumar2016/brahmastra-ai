@@ -1,5 +1,9 @@
 # Architecture
 
+> **Purpose:** Implementation-level record of the architecture as built so far (kept in sync with the code).
+> **Last Updated:** 2026-08-02
+> **Related Documents:** [Master Spec](MASTER_SPEC.md) · [System Architecture](01-architecture/architecture.md) · [Extension Architecture](01-architecture/extension-architecture.md) · [Change Log](CHANGELOG.md)
+
 ## Overview
 
 Brahmastra AI is a monorepo housing a Chrome Extension for AI-powered trading. The repository is organized into two primary directories: `apps/` and `packages/`.
@@ -293,7 +297,7 @@ When a supported chart page is detected, the **Context Extraction Engine** colle
 
 ### Design
 
-The engine follows SOLID principles. Each detector has a single responsibility and depends on the `DomReader` abstraction (dependency inversion). `ContextExtractor` is the facade that orchestrates all detectors and exposes a single async method:
+The engine follows SOLID principles. Each detector has a single responsibility and depends on the `DomReader` abstraction (dependency inversion). `ChartContextExtractor` is the facade that orchestrates all detectors and exposes a single async method:
 
 ```
 getChartContext(): Promise<ChartContext>
@@ -302,29 +306,79 @@ getChartContext(): Promise<ChartContext>
 - **DomReader** wraps all DOM access (`query`, `queryAll`, `text`, `exists`, plus scoped variants) so selectors can be changed in one place and reads never throw.
 - **Detectors** extract one facet each: symbol/timeframe/chart type, indicators, price, market status.
 - **Legend items are queried once** by the orchestrator and shared between the indicator and price detectors to avoid duplicate DOM lookups.
-- **Error handling** — no exceptions propagate. Detectors return partial/empty data and `ContextExtractor` falls back to a partial `ChartContext` if anything unexpected throws.
+- **Partial extraction** — detectors are invoked through an isolated `tryDetector` guard. A failure in one detector is logged and that detector's field is dropped; every other detector still contributes to the returned `ChartContext`. A failing `PriceDetector` leaves only `visiblePrice` as `undefined`.
+
+### Dependency Injection
+
+`ChartContextExtractor` does not construct its detectors itself. Detectors are passed in through the constructor:
+
+```
+new ChartContextExtractor({
+  symbolDetector,
+  indicatorDetector,
+  priceDetector,
+  marketDetector,
+})
+```
+
+Every dependency is optional and defaults to a real detector bound to a shared `DomReader`, so `new ChartContextExtractor()` continues to work unchanged. Injecting fakes (or a subset) is how tests isolate each detector and how future extractors (`BrokerContextExtractor`, `MarketContextExtractor`, `NewsContextExtractor`) reuse the same pattern.
+
+### Logger Abstraction
+
+All logging goes through a reusable `Logger` interface (`src/core/logger.ts`) with a `ConsoleLogger` implementation:
+
+```
+Logger.debug/info/warn/error(message)
+```
+
+- Instances are created with a prefix, so the context module logs under `[Context]` automatically.
+- Each instance has an `enabled` flag, so logging can be switched off globally without touching call sites.
+- No module writes to `console.*` directly.
+
+### Debounced Extraction Flow
+
+The content script schedules extraction, not scrapes:
+
+```
+page change / navigation / mutation
+        │
+        ├─ new chart URL  ──────────────────► extract immediately
+        └─ same URL (SPA mutations, titles) ─► debounce ~500ms ──► single extraction
+```
+
+- The first chart load extracts **immediately**.
+- Rapid DOM mutations within the window coalesce into **one** extraction, avoiding repeated scraping.
+- The delay is the single constant `CONTEXT_EXTRACTION_DEBOUNCE_MS` in `src/content/extraction-scheduler.ts`.
+- An in-flight guard prevents overlapping extractions; a mutation arriving mid-extraction re-runs once afterwards.
 
 ### Folder Structure
 
 ```
-apps/extension/src/core/context/
-├── index.ts               # Barrel export
-├── chart-context.ts       # ChartContext, IndicatorInfo, MarketStatus types
-├── context-extractor.ts   # Orchestrator facade (getChartContext)
-├── dom-reader.ts          # Reusable DOM utilities
-├── selectors.ts           # Centralized TradingView DOM selectors
-├── normalize.ts           # Text normalization helpers
-├── logging.ts             # [Context] debug logger
-├── symbol-detector.ts     # Symbol, exchange, timeframe, chart type
-├── indicator-detector.ts  # Visible indicator names + parameters
-├── price-detector.ts      # Visible price (best effort)
-└── market-detector.ts     # Market open/closed (best effort)
+apps/extension/src/
+├── core/
+│   ├── logger.ts              # Reusable Logger interface + ConsoleLogger
+│   ├── text-utils.ts          # Reusable text helpers (normalizeText)
+│   └── context/
+│       ├── index.ts                  # Barrel export
+│       ├── chart-context.ts          # ChartContext, IndicatorInfo, MarketStatus types
+│       ├── chart-context-extractor.ts # Orchestrator facade (getChartContext)
+│       ├── dom-reader.ts             # Reusable DOM utilities
+│       ├── selectors.ts              # Centralized TradingView DOM selectors
+│       ├── logging.ts                # contextLogger ([Context] prefix)
+│       ├── indicator-registry.ts     # Indicator alias table + lookup
+│       ├── symbol-detector.ts        # Symbol, exchange, timeframe, chart type
+│       ├── indicator-detector.ts     # Visible indicator names + parameters
+│       ├── price-detector.ts         # Visible price (best effort)
+│       └── market-detector.ts        # Market open/closed (best effort)
+└── content/
+    ├── index.ts               # Wires detection + debounced extraction
+    └── extraction-scheduler.ts # ExtractionScheduler (immediate/debounced)
 ```
 
 ### Extraction Flow
 
 ```
-ContextExtractor.getChartContext()
+ChartContextExtractor.getChartContext()
 │
 ├── SymbolDetector.extract(url)        → symbol, exchange, timeframe, chartType
 ├── queryAll(legend items)  (once)
@@ -335,7 +389,7 @@ ContextExtractor.getChartContext()
 └── ChartContext (timestamped)
 ```
 
-The content script runs this service on every detected page change (throttled and debounced), and debug-logs the result under the `[Context]` prefix.
+Each step is wrapped so a failure never aborts the remaining steps.
 
 ### Detector Responsibilities
 
@@ -346,17 +400,38 @@ The content script runs this service on every detected page change (throttled an
 | `PriceDetector`     | visible price from the main legend values | `undefined`                  |
 | `MarketDetector`    | open/closed from header status elements   | `undefined`                  |
 
+The price detector locates the primary instrument by matching legend `aria-label` or source title against the known symbol (handling `EXCHANGE:SYMBOL` forms) before falling back to the first legend item — it does not assume ordering.
+
+### Indicator Registry
+
+Indicator aliases live in `indicator-registry.ts` (`INDICATOR_ALIASES` + `lookupIndicatorName`). The detector only consults the registry. Adding a new indicator is a one-line registry change and keeps the detector implementation small and stable.
+
 ### Data Sources
 
 Only information already present in the page is used — the URL query string (`symbol`, `interval`, `chartType`) and the TradingView DOM (header breadcrumb, timeframe/chart-type toolbars, legend). No candles are scraped, no undocumented APIs are called.
 
+### Testing Strategy
+
+Pure parsing and utility functions are unit-tested with **Vitest** (no DOM integration). Files are co-located as `*.test.ts` and excluded from the production build:
+
+| Function                | Location                                      |
+| ----------------------- | --------------------------------------------- |
+| `normalizeText()`       | `src/core/text-utils.test.ts`                 |
+| `parseSymbol()`         | `src/shared/detection/chart-info.test.ts`     |
+| `parseTimeframe()`      | `src/shared/detection/chart-info.test.ts`     |
+| `parsePrice()`          | `src/core/context/price-detector.test.ts`     |
+| `parseIndicatorTitle()` | `src/core/context/indicator-detector.test.ts` |
+| `lookupIndicatorName()` | `src/core/context/indicator-detector.test.ts` |
+
+Each suite covers valid inputs, invalid inputs, empty values, and edge cases. Run with `pnpm test` (turbo) or `cd apps/extension && pnpm test` (Vitest directly).
+
 ### Logging
 
-Debug logs use the `[Context]` prefix and include extracted symbol, timeframe, indicator count, and extraction time.
+Debug logs use the `[Context]` prefix (via `contextLogger`) and include extracted symbol, timeframe, indicator count, and extraction time. Detector failures are logged at `warn`/`error` level without stopping other detectors.
 
 ### Future Compatibility
 
-`ChartContext` is designed so later milestones can extend it (OHLC, support/resistance, trend, patterns, broker positions, watchlist, news) without breaking existing consumers — new fields are added as optional members.
+`ChartContext` is designed so later milestones can extend it (OHLC, support/resistance, trend, patterns, broker positions, watchlist, news) without breaking existing consumers — new fields are added as optional members. Future extractors mirror `ChartContextExtractor`'s DI + partial-extraction pattern.
 
 ---
 

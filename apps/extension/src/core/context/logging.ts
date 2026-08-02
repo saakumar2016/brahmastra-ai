@@ -1,5 +1,3 @@
-const PREFIX = "[Context]";
+import { ConsoleLogger } from "../../core/logger";
 
-export function contextLog(message: string): void {
-  console.debug(PREFIX, message);
-}
+export const contextLogger = new ConsoleLogger("[Context]");

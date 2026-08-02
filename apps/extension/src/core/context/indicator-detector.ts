@@ -1,38 +1,10 @@
+import { normalizeText } from "../text-utils";
 import type { IndicatorInfo } from "./chart-context";
 import type { DomReader } from "./dom-reader";
-import { normalizeText } from "./normalize";
+import { lookupIndicatorName } from "./indicator-registry";
 import { CONTEXT_SELECTORS } from "./selectors";
 
-const INDICATOR_ALIASES: Record<string, string> = {
-  EMA: "EMA",
-  SMA: "SMA",
-  WMA: "WMA",
-  VWAP: "VWAP",
-  RSI: "RSI",
-  MACD: "MACD",
-  VOL: "Volume",
-  VOLUME: "Volume",
-  SUPERTREND: "SuperTrend",
-  "BOLLINGER BANDS": "Bollinger Bands",
-  BB: "Bollinger Bands",
-  STOCHASTIC: "Stochastic",
-  STOCH: "Stochastic",
-  ATR: "ATR",
-  OBV: "OBV",
-  CCI: "CCI",
-  ADX: "ADX",
-  ICHIMOKU: "Ichimoku",
-  "PARABOLIC SAR": "Parabolic SAR",
-  MOMENTUM: "Momentum",
-  ROC: "ROC",
-  "WILLIAMS %R": "Williams %R",
-};
-
-function matchIndicatorName(raw: string): string | null {
-  return INDICATOR_ALIASES[raw.toUpperCase()] ?? null;
-}
-
-function parseIndicatorTitle(title: string): IndicatorInfo | null {
+export function parseIndicatorTitle(title: string): IndicatorInfo | null {
   const cleaned = normalizeText(title);
   if (cleaned === "") {
     return null;
@@ -41,7 +13,7 @@ function parseIndicatorTitle(title: string): IndicatorInfo | null {
   // "Name (p1, p2)" or "Name(p1)"
   const parenMatch = cleaned.match(/^(.+?)\s*\(([^)]*)\)\s*$/);
   if (parenMatch !== null) {
-    const name = matchIndicatorName(parenMatch[1].trim());
+    const name = lookupIndicatorName(parenMatch[1].trim());
     if (name === null) {
       return null;
     }
@@ -55,14 +27,14 @@ function parseIndicatorTitle(title: string): IndicatorInfo | null {
   // "Name 20"
   const spaceMatch = cleaned.match(/^(.+?)\s+(\d+)$/);
   if (spaceMatch !== null) {
-    const name = matchIndicatorName(spaceMatch[1].trim());
+    const name = lookupIndicatorName(spaceMatch[1].trim());
     if (name === null) {
       return null;
     }
     return { name, parameters: [spaceMatch[2]] };
   }
 
-  const name = matchIndicatorName(cleaned);
+  const name = lookupIndicatorName(cleaned);
   if (name === null) {
     return null;
   }
