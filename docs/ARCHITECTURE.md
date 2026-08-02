@@ -38,6 +38,8 @@ The background service worker is the extension's event-driven brain. It runs per
 
 - Responding to `PING` requests with `PONG`
 - Responding to `GET_EXTENSION_STATUS` with extension version and timestamp
+- Storing the latest TradingView page detection per tab (single source of truth)
+- Responding to `GET_PAGE_DETECTION` with the stored detection state
 - Coordinating messages between content scripts and the popup/side panel (future)
 - Managing long-lived state and API connections (future)
 
@@ -45,14 +47,27 @@ It has **no DOM access** and runs in its own isolated context.
 
 ### Content Script
 
-**File:** `src/content/index.ts`
+**Files:** `src/content/index.ts`, `src/content/page-watcher.ts`
 
 Content scripts are injected into web pages that match the declared URL patterns:
 
 - `https://*.tradingview.com/*`
 - `https://kite.zerodha.com/*`
 
-Current behavior: sends `PING` on load and logs "Communication established" on success.
+Current behavior:
+
+- Sends `PING` on load and logs "Communication established" on success
+- Runs the detection service on load and after every page change
+- Sends `PAGE_DETECTED` messages to the background with the structured detection result
+
+The page watcher (`page-watcher.ts`) triggers re-detection whenever:
+
+- The SPA navigates via `history.pushState` / `history.replaceState`
+- The `popstate` or `hashchange` events fire
+- The document title changes (symbol/timeframe switch without a URL change)
+- A background poll detects a URL or title change (2s interval fallback)
+
+Business logic (detection) lives in `shared/detection/`, not in the content script. The content script only composes detectors and forwards results.
 
 Future responsibilities will include:
 
@@ -68,7 +83,7 @@ Content scripts have **partial DOM access** but run in an isolated world (not th
 
 The popup is a small React application that opens when the user clicks the extension toolbar icon. It is built as a separate Vite HTML entry point.
 
-Current behavior: displays "Brahmastra AI" heading with a "Check Extension Status" button. On click, sends `GET_EXTENSION_STATUS` and shows loaded state, version, and timestamp.
+Current behavior: displays "Brahmastra AI" heading with a "Check Extension Status" button. On click, sends `GET_EXTENSION_STATUS` and shows loaded state, version, and timestamp. It also requests the latest page detection on load and renders it via the shared `DetectionStatus` component.
 
 Future responsibilities:
 
@@ -84,7 +99,7 @@ The popup **closes when the user clicks outside it**, so it should not hold crit
 
 The side panel is a persistent React application that lives in the Chrome DevTools side panel. Unlike the popup, it stays open across tab navigations.
 
-Current behavior: displays "Brahmastra AI" heading with "Communication Ready" status and a "Ping Background" button. On click, sends `PING` and displays "PONG" on success.
+Current behavior: displays "Brahmastra AI" heading with "Communication Ready" status and a "Ping Background" button. On click, sends `PING` and displays "PONG" on success. It also requests the latest page detection on load and renders it via the shared `DetectionStatus` component.
 
 Future responsibilities:
 
@@ -142,7 +157,8 @@ The extension comprises four isolated runtime environments that must communicate
 │     POPUP        │  │   SIDE PANEL     │  │  CONTENT SCRIPT  │
 │                  │  │                  │  │                  │
 │  Request status  │  │  Ping background │  │  PING on load    │
-│  Display result  │  │  Display PONG    │  │  Log result      │
+│  Display result  │  │  Display PONG    │  │  Report page     │
+│  Show detection  │  │  Show detection  │  │  (PAGE_DETECTED) │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
@@ -157,13 +173,13 @@ Instead of calling `chrome.runtime.sendMessage` directly throughout the codebase
 
 ### Files
 
-| File                                      | Purpose                                                                                               |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `src/shared/messaging/constants.ts`       | String constants for all message types (prevents typos across files)                                  |
-| `src/shared/messaging/types.ts`           | Shared data structures (e.g., `ExtensionStatus`)                                                      |
-| `src/shared/messaging/message-types.ts`   | Strongly typed discriminated unions: `Request`, `Response`, `Message`                                 |
-| `src/shared/messaging/message-bus.ts`     | Low-level transport: `send()` (fire-and-forget), `request()` (await response), `onMessage()` (listen) |
-| `src/shared/messaging/message-handler.ts` | Higher-level dispatch: `handle(type, handler)` + `listen()` registers everything                      |
+| File                                      | Purpose                                                                                                                                                           |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/shared/messaging/constants.ts`       | String constants for all message types (prevents typos across files)                                                                                              |
+| `src/shared/messaging/types.ts`           | Shared data structures (e.g., `ExtensionStatus`)                                                                                                                  |
+| `src/shared/messaging/message-bus.ts`     | Low-level transport: `send()` (fire-and-forget), `request()` (await response), `onMessage()` (listen, also passes the message `sender`)                           |
+| `src/shared/messaging/message-handler.ts` | Higher-level dispatch: `handle(type, handler)` + `listen()` registers everything; handlers receive `(message, sender)`                                            |
+| `src/shared/messaging/message-types.ts`   | Strongly typed discriminated unions: `Request`, `Response`, `Message` — includes the detection messages (`PAGE_DETECTED`, `GET_PAGE_DETECTION`, `PAGE_DETECTION`) |
 
 ### Message Flow
 
@@ -191,6 +207,86 @@ Sender                      Background                    Receiver
 
 ---
 
+## TradingView Detection Architecture (Milestone 5)
+
+A reusable, extensible detection layer identifies whether the current page is a supported TradingView view and exposes structured page metadata to the rest of the extension.
+
+### Design
+
+Detection is split into a **detection service** (pure logic) and a **page watcher** (observation). The content script stays lightweight — it only composes detectors, observes changes, and forwards results.
+
+- **Detectors** implement the `PageDetector` interface (`matches(url)` + `detect(doc, url)`) and are registered with the `DetectionService`.
+- The **DetectionService** picks the first detector that `matches()` the URL and returns its result. If no detector matches, it returns `{ supported: false, reason: "Not a TradingView page" }`.
+- The **TradingViewDetector** recognizes `tradingview.com` and `*.tradingview.com`, and classifies `/chart/*` paths as a supported **chart** page.
+- Page metadata (symbol, exchange, timeframe, url, title) is extracted from the URL query string (`symbol`, `interval`) and the document title only — no DOM scraping, no undocumented APIs.
+- Future page types (screener, watchlist, symbol page) and detectors (NSE, Broker) are added by implementing new detectors and registering them — no changes to the existing architecture.
+
+### Folder Structure
+
+```
+apps/extension/src/shared/detection/
+├── index.ts               # Barrel export
+├── types.ts               # PageDetection union + page type constants/labels
+├── detector.ts            # PageDetector interface
+├── detection-service.ts   # DetectionService (matches detectors to URLs)
+├── tradingview-detector.ts # TradingView page classifier
+├── chart-info.ts          # Symbol/exchange/timeframe extraction
+└── detection-store.ts     # Background-side state store (per tab)
+```
+
+### Supported Page Types
+
+| `pageType` | URL pattern | Extracted metadata                      |
+| ---------- | ----------- | --------------------------------------- |
+| `chart`    | `/chart/*`  | symbol, exchange, timeframe, url, title |
+
+Unsupported results are `{ supported: false, reason }` with reasons such as `"Not a TradingView page"` or `"Unsupported TradingView page"`.
+
+### Detection Flow
+
+```
+┌──────────────────────────┐
+│  Content Script          │
+│  ┌────────────────────┐  │
+│  │ page-watcher.ts    │  │  history/popstate/title/poll
+│  └─────────┬──────────┘  │        events
+│            ▼             │
+│  DetectionService        │
+│    └─ TradingViewDetector│
+│            ▼             │
+│     PageDetection        │
+│            │             │
+└────────────┼─────────────┘
+             │ PAGE_DETECTED (bus.send)
+             ▼
+┌──────────────────────────┐
+│  Background Service      │
+│  DetectionStore          │
+│  (keyed by tab id)       │
+└───────┬──────────┬───────┘
+        │          ▲
+        │          │ GET_PAGE_DETECTION
+        ▼          │
+┌────────────┐  ┌──────────────┐
+│   Popup    │  │ Side Panel   │
+│ (on mount) │  │ (on mount)   │
+└────────────┘  └──────────────┘
+```
+
+### Message Flow
+
+| Message              | Sender     | Receiver   | Direction                             |
+| -------------------- | ---------- | ---------- | ------------------------------------- |
+| `PAGE_DETECTED`      | Content    | Background | pushes detection payload (per tab)    |
+| `GET_PAGE_DETECTION` | Popup/Side | Background | requests stored detection             |
+| `PAGE_DETECTION`     | Background | Popup/Side | responds with `PageDetection \| null` |
+
+### State Ownership
+
+The **background service worker** is the single source of truth for detection state. It stores the latest `PageDetection` per tab (from `PAGE_DETECTED`) and serves it to the Popup and Side Panel via `GET_PAGE_DETECTION` / `PAGE_DETECTION`. Popup and Side Panel never compute detection themselves; they only render what the background reports. The `DetectionStore` keeps a per-tab map plus a fallback to the latest result when the requesting context has no tab.
+
+---
+
 ## UI Architecture (Milestone 4)
 
 The extension UI is built with React, CSS Modules, and a centralized CSS custom property theme. No CSS frameworks are used.
@@ -209,6 +305,7 @@ apps/extension/src/
 ├── components/           # Reusable UI components
 │   ├── Button/           # Primary/secondary button
 │   ├── Card/             # Generic card container
+│   ├── DetectionStatus/  # TradingView detection display
 │   ├── Header/           # Title + subtitle header
 │   ├── Layout/           # Shared page layout wrapper
 │   └── StatusCard/       # Key-value status display
@@ -232,9 +329,9 @@ apps/extension/src/
 │   ├── App.tsx           # Side Panel root component
 │   ├── index.html        # Side Panel HTML shell
 │   └── main.tsx          # React mount
-├── background/           # Service Worker
-├── content/              # Content Script
-├── shared/               # Shared utilities (messaging)
+├── background/           # Service Worker (state owner)
+├── content/              # Content Script (page watcher)
+├── shared/               # Shared messaging + detection layer
 └── types/                # Shared TypeScript types
 ```
 
@@ -246,6 +343,7 @@ Layout
 └── Button (primary, secondary)
 └── Card
 └── StatusCard (label/value rows)
+└── DetectionStatus (renders a StatusCard from PageDetection state)
 ```
 
 ### Theme Organization

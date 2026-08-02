@@ -64,6 +64,25 @@ After loading the extension, perform these checks:
 2. Find Brahmastra AI → click "Service Worker" link
 3. Console should show: "Background worker started"
 
+### TradingView Detection
+
+The extension detects whether the active tab is a supported TradingView page and exposes page metadata to the Popup and Side Panel.
+
+**Supported pages**
+
+| Page  | URL pattern     | Detection result                              |
+| ----- | --------------- | --------------------------------------------- |
+| Chart | `/chart/*`      | `{ supported: true, pageType: "chart", ... }` |
+| Other | everything else | `{ supported: false, reason: "..." }`         |
+
+**Verifying detection**
+
+1. Navigate to a TradingView chart page, e.g. `https://www.tradingview.com/chart/?symbol=BINANCE:BTCUSDT`
+2. Open the Popup
+3. The **TradingView Detection** section should show: Detected, Chart, Symbol, Exchange, Timeframe, and URL
+
+Fields are shown as **Unavailable** when the data cannot be determined from the page (e.g. the symbol is not present in the URL).
+
 ## Scripts
 
 | Script                 | Description                          |
@@ -87,9 +106,9 @@ brahmastra-ai/
 │           ├── theme/        # Centralized CSS theme tokens
 │           ├── popup/        # Popup React app
 │           ├── sidepanel/    # Side Panel React app
-│           ├── background/   # Service Worker
-│           ├── content/      # Content Script
-│           ├── shared/       # Shared messaging layer
+│           ├── background/   # Service Worker (state owner)
+│           ├── content/      # Content Script (page watcher)
+│           ├── shared/       # Shared messaging + detection layer
 │           └── types/        # Shared TypeScript types
 ├── packages/            # Shared libraries
 ├── docs/                # Project documentation
