@@ -22,7 +22,7 @@ const TIMEFRAME_LABELS: Record<string, string> = {
   M: "1M",
 };
 
-function parseSymbol(raw: string): { exchange: string; symbol: string } {
+export function parseSymbol(raw: string): { exchange: string; symbol: string } {
   const trimmed = raw.trim();
   if (trimmed === "") {
     return { exchange: "", symbol: "" };
@@ -42,7 +42,7 @@ function symbolFromTitle(title: string): string {
   return match?.[1] ?? "";
 }
 
-function parseTimeframe(interval: string | null): string {
+export function parseTimeframe(interval: string | null): string {
   if (interval === null) {
     return "";
   }
