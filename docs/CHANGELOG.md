@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `M04-T01` review refinement: `parseCandleTime` now accepts only strict ISO-8601 datetimes (with timezone) or Unix seconds/ms; `Candle`/`RawCandle` are `readonly` value objects; shared `NumericValue` alias.
 - `M04-T02` — Data source abstraction: `MarketDataSource` interface, `Instrument`, `CandleRange`, `CandleRequest` types, `isValidCandleRequest` boundary guard + 10 tests.
 - `M04-T03` — Fetch + cache: `MarketDataService` (DI source + cache, offline-first), `CandleCache`/`InMemoryCandleCache`, case-insensitive `buildCandleCacheKey`, cache-miss fetch → normalize → store, defensive copies on cache hits, invalid-request rejection + 13 tests.
+- `M04-T04` — Graceful fallback: source failures are caught, logged via an injectable `logger`, and served as an empty series instead of throwing; failed fetches are not cached so retries re-consult the source + 3 tests.
 - UI polish: `color-scheme: dark`, focus-visible button rings, tokenized primary text color, overflow-safe status values, full-height panel layout, full-width side-panel button.
 
 ## [0.3.0] — 2026-08-02 — Milestone 03: TradingView Context Engine

@@ -6,6 +6,7 @@ import {
   type CandleRequest,
   type MarketDataSource,
 } from "./data-source";
+import type { Logger } from "../logger";
 import { MarketDataService } from "./market-data-service";
 import type { RawCandle } from "./normalize";
 
@@ -44,6 +45,10 @@ function createService(raw: RawCandle[] = [RAW]) {
   const cache = new InMemoryCandleCache();
   const service = new MarketDataService({ source, cache });
   return { service, source, getCandles, cache };
+}
+
+function createSilentLogger(): Logger {
+  return { warn: vi.fn(), error: vi.fn(), info: vi.fn(), debug: vi.fn() };
 }
 
 describe("MarketDataService", () => {
@@ -105,5 +110,52 @@ describe("MarketDataService", () => {
     const result = await service.getCandles(REQUEST);
     expect(getCandles).toHaveBeenCalledTimes(1);
     expect(result).toEqual([NORMALIZED]);
+  });
+
+  it("falls back to an empty series and logs when the source fails", async () => {
+    const getCandles = vi.fn(async () => {
+      throw new Error("network down");
+    });
+    const source: MarketDataSource = { getCandles };
+    const logger = createSilentLogger();
+    const service = new MarketDataService({
+      source,
+      cache: new InMemoryCandleCache(),
+      logger,
+    });
+    await expect(service.getCandles(REQUEST)).resolves.toEqual([]);
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not cache a failed fetch, so a later call retries the source", async () => {
+    const getCandles = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("boom"))
+      .mockResolvedValueOnce([NORMALIZED]);
+    const source: MarketDataSource = { getCandles };
+    const service = new MarketDataService({
+      source,
+      cache: new InMemoryCandleCache(),
+      logger: createSilentLogger(),
+    });
+    await expect(service.getCandles(REQUEST)).resolves.toEqual([]);
+    await expect(service.getCandles(REQUEST)).resolves.toEqual([NORMALIZED]);
+    expect(getCandles).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps serving cached data once the source becomes unavailable", async () => {
+    const getCandles = vi
+      .fn()
+      .mockResolvedValueOnce([NORMALIZED])
+      .mockRejectedValue(new Error("offline"));
+    const source: MarketDataSource = { getCandles };
+    const service = new MarketDataService({
+      source,
+      cache: new InMemoryCandleCache(),
+      logger: createSilentLogger(),
+    });
+    await expect(service.getCandles(REQUEST)).resolves.toEqual([NORMALIZED]);
+    await expect(service.getCandles(REQUEST)).resolves.toEqual([NORMALIZED]);
+    expect(getCandles).toHaveBeenCalledTimes(1);
   });
 });
