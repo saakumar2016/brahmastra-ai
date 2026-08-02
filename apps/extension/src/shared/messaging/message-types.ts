@@ -1,4 +1,5 @@
 import { MSG } from "./constants";
+import type { PageDetection } from "../detection/types";
 import type { ExtensionStatus } from "./types";
 
 export interface PingMessage {
@@ -33,9 +34,29 @@ export interface HeartbeatMessage {
   };
 }
 
-export type Request =
-  PingMessage | GetExtensionStatusMessage | OpenSidePanelMessage | HeartbeatMessage;
+export interface PageDetectedMessage {
+  type: typeof MSG.PAGE_DETECTED;
+  payload: PageDetection;
+}
 
-export type Response = PongMessage | ExtensionStatusMessage | SidePanelOpenedMessage;
+export interface GetPageDetectionMessage {
+  type: typeof MSG.GET_PAGE_DETECTION;
+}
+
+export interface PageDetectionMessage {
+  type: typeof MSG.PAGE_DETECTION;
+  payload: PageDetection | null;
+}
+
+export type Request =
+  | PingMessage
+  | GetExtensionStatusMessage
+  | OpenSidePanelMessage
+  | HeartbeatMessage
+  | PageDetectedMessage
+  | GetPageDetectionMessage;
+
+export type Response =
+  PongMessage | ExtensionStatusMessage | SidePanelOpenedMessage | PageDetectionMessage;
 
 export type Message = Request | Response;

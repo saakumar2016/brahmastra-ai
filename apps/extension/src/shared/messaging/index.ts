@@ -1,5 +1,6 @@
 export { MSG } from "./constants";
 export { MessageBus } from "./message-bus";
+export type { MessageListener } from "./message-bus";
 export { MessageHandler } from "./message-handler";
 export type {
   PingMessage,
@@ -9,6 +10,9 @@ export type {
   OpenSidePanelMessage,
   SidePanelOpenedMessage,
   HeartbeatMessage,
+  PageDetectedMessage,
+  GetPageDetectionMessage,
+  PageDetectionMessage,
   Request,
   Response,
   Message,

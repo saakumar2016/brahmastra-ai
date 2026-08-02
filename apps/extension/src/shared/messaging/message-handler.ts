@@ -1,7 +1,8 @@
+import type { MessageListener } from "./message-bus";
 import { MessageBus } from "./message-bus";
-import type { Request, Response } from "./message-types";
+import type { Request } from "./message-types";
 
-type Handler = (message: Request) => Promise<Response | void>;
+type Handler = MessageListener;
 
 export class MessageHandler {
   private handlers = new Map<string, Handler>();
@@ -13,10 +14,10 @@ export class MessageHandler {
   }
 
   listen(): void {
-    this.bus.onMessage(async (message) => {
+    this.bus.onMessage(async (message, sender) => {
       const handler = this.handlers.get(message.type);
       if (handler) {
-        return handler(message);
+        return handler(message, sender);
       }
     });
   }
