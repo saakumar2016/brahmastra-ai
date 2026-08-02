@@ -1,5 +1,9 @@
 # Architecture
 
+> **Purpose:** Implementation-level record of the architecture as built so far (kept in sync with the code).
+> **Last Updated:** 2026-08-02
+> **Related Documents:** [Master Spec](MASTER_SPEC.md) · [System Architecture](01-architecture/architecture.md) · [Extension Architecture](01-architecture/extension-architecture.md) · [Change Log](CHANGELOG.md)
+
 ## Overview
 
 Brahmastra AI is a monorepo housing a Chrome Extension for AI-powered trading. The repository is organized into two primary directories: `apps/` and `packages/`.
