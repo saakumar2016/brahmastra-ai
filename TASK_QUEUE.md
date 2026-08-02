@@ -57,6 +57,7 @@ Status values: `Ready` · `In Progress` · `Review` · `Completed`.
 | M02-T06 | `DetectionService` + `DetectionStore` (background)           | High     | M    | M02-T05          | Completed |
 | M02-T07 | Content `page-watcher`                                       | Medium   | S    | M02-T05          | Completed |
 | M02-T08 | Popup + Side Panel detection UI                              | Medium   | M    | M02-T03, M02-T06 | Completed |
+| M02-T09 | Cosmetic UI polish pass (theme tokens, focus rings, layout)  | Low      | S    | M02-T02..T08     | Completed |
 
 ### Milestone 03 — TradingView Context Engine (Completed)
 
@@ -78,8 +79,8 @@ Status values: `Ready` · `In Progress` · `Review` · `Completed`.
 | Task ID | Title                                                    | Priority | Size | Deps          | Status    |
 | ------- | -------------------------------------------------------- | -------- | ---- | ------------- | --------- |
 | M04-T01 | Candle/OHLCV model + normalization                       | High     | M    | M03 (context) | Completed |
-| M04-T02 | Data source abstraction (swappable page/backend)         | High     | M    | M04-T01       | Ready     |
-| M04-T03 | Fetch + cache for `(symbol, exchange, timeframe, range)` | High     | M    | M04-T02       | Ready     |
+| M04-T02 | Data source abstraction (swappable page/backend)         | High     | M    | M04-T01       | Completed |
+| M04-T03 | Fetch + cache for `(symbol, exchange, timeframe, range)` | High     | M    | M04-T02       | Completed |
 | M04-T04 | Graceful fallback when data is unavailable               | Medium   | S    | M04-T03       | Ready     |
 | M04-T05 | Unit + integration tests (parsing, normalization, cache) | High     | M    | M04-T01..04   | Ready     |
 | M04-T06 | Update docs: entities, feature doc, changelog            | Medium   | S    | M04-T05       | Ready     |
@@ -178,6 +179,6 @@ Status values: `Ready` · `In Progress` · `Review` · `Completed`.
 ## How "work next" Resolves the Next Task
 
 1. Read [PROJECT_STATE.md](PROJECT_STATE.md) → the current milestone is **04**.
-2. Scan the table above for the current milestone's highest-priority task in **Ready** → `M04-T01`.
+2. Scan the table above for the current milestone's highest-priority task in **Ready** → `M04-T04`.
 3. Verify its dependencies (M03 — context engine) are Completed.
 4. Implement exactly that task; run gates; update this file, `PROJECT_STATE.md`, `ROADMAP_PROGRESS.md`, `docs/CHANGELOG.md`, and the milestone doc; stop.

@@ -1,5 +1,7 @@
+/** A price or volume field that may arrive as a number or numeric string. */
 export type NumericValue = number | string;
 
+/** A normalized OHLCV candle with millisecond `time` and numeric fields. */
 export interface Candle {
   readonly time: number;
   readonly open: number;
@@ -9,6 +11,7 @@ export interface Candle {
   readonly volume: number;
 }
 
+/** An unvalidated candle as read from a source; see {@link normalizeCandle}. */
 export interface RawCandle {
   readonly time: NumericValue;
   readonly open: NumericValue;
