@@ -5,6 +5,7 @@
     "build:extension": "pnpm --filter brahmastra-extension build",
     "dev:extension": "pnpm --filter brahmastra-extension dev",
     "lint": "turbo lint",
+    "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
     "typecheck": "turbo typecheck",

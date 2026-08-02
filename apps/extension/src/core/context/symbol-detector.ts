@@ -1,6 +1,6 @@
 import { parseSymbol, parseTimeframe } from "../../shared/detection/chart-info";
+import { normalizeText } from "../text-utils";
 import type { DomReader } from "./dom-reader";
-import { normalizeText } from "./normalize";
 import { CONTEXT_SELECTORS } from "./selectors";
 
 export interface SymbolInfo {

@@ -113,11 +113,37 @@ When a supported chart page is detected, the content script runs the **Context E
 
 DOM selectors are centralized in `src/core/context/selectors.ts` — update them there when TradingView changes its DOM.
 
+**How it runs**
+
+- A new chart URL is extracted **immediately** on load.
+- Same-page DOM mutations (SPA navigation, title changes) are **debounced** (~500ms) so many mutations produce a single extraction. The delay is a single constant, `CONTEXT_EXTRACTION_DEBOUNCE_MS` in `src/content/extraction-scheduler.ts`.
+- Detectors run **independently**. If one fails (e.g. price), the others still contribute — only the failed field is dropped and the failure is logged.
+- Extraction runs only on chart pages; unsupported pages never trigger it.
+
+**Design notes**
+
+- `ChartContextExtractor` receives its detectors via **dependency injection** (defaults provided), so each detector can be tested or swapped in isolation.
+- Indicator aliases live in a dedicated **indicator registry** (`src/core/context/indicator-registry.ts`). Add new indicators there — the detector needs no changes.
+- All debug output goes through a reusable **Logger** (`src/core/logger.ts`) with an automatic `[Context]` prefix; logging can be disabled by flag.
+- Text normalization helpers are reusable in `src/core/text-utils.ts`.
+
+**Tests**
+
+Pure parsing/utility logic has unit tests (Vitest):
+
+```
+cd apps/extension
+pnpm test
+```
+
+Covered: `normalizeText()`, `parsePrice()`, `parseIndicatorTitle()`, `parseSymbol()`, `parseTimeframe()`, and indicator alias lookup — including valid, invalid, empty and edge-case inputs.
+
 ## Scripts
 
 | Script                 | Description                          |
 | ---------------------- | ------------------------------------ |
 | `pnpm lint`            | Run ESLint across all packages       |
+| `pnpm test`            | Run unit tests across all packages   |
 | `pnpm format`          | Format code with Prettier            |
 | `pnpm format:check`    | Check formatting without writing     |
 | `pnpm typecheck`       | Run TypeScript checks                |

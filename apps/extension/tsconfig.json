@@ -9,5 +9,6 @@
     "types": ["chrome"]
   },
   "include": ["src", "vite-env.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
   "references": []
 }
